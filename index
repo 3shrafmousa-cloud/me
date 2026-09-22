@@ -1,0 +1,2221 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ASHRAF — Digital Identity</title>
+<meta name="description" content="ASHRAF — Developer, Programmer, Digital Builder. Quiet life. Refined taste. Bigger goals.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --black:#050505;
+  --black2:#090909;
+  --white:#eee9e6;
+  --muted:#77716e;
+  --red:#d92731;
+  --red2:#7d0b10;
+  --line:rgba(255,255,255,.09);
+  --display:"Space Grotesk",sans-serif;
+  --mono:"DM Mono",monospace;
+  --arabic:"Cairo",sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{background:var(--black);color:var(--white);overflow-x:hidden}
+body{font-family:var(--display);cursor:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;border:0;background:none;color:inherit}
+img{display:block;max-width:100%}
+
+@media (pointer:coarse){
+  body{cursor:auto}
+}
+
+::selection{
+  background:var(--red);
+  color:white;
+}
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+.wrap{
+  width:min(1400px,100%);
+  margin:auto;
+  padding-inline:clamp(20px,5vw,72px);
+}
+
+section{
+  position:relative;
+}
+
+.mono{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.16em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+.line{
+  width:100%;
+  height:1px;
+  background:var(--line);
+}
+
+.red{
+  color:var(--red);
+}
+
+[dir="rtl"] body{
+  font-family:var(--arabic);
+}
+
+[dir="rtl"] .mono{
+  font-family:var(--arabic);
+  letter-spacing:0;
+}
+
+/* =========================================================
+   CURSOR
+========================================================= */
+
+.cursor{
+  position:fixed;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:white;
+  pointer-events:none;
+  z-index:9999;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+}
+
+.cursor-ring{
+  position:fixed;
+  width:34px;
+  height:34px;
+  border:1px solid rgba(255,255,255,.4);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9998;
+  transform:translate(-50%,-50%);
+  transition:
+    width .35s cubic-bezier(.16,1,.3,1),
+    height .35s cubic-bezier(.16,1,.3,1),
+    border-color .35s ease;
+}
+
+.cursor-ring.active{
+  width:74px;
+  height:74px;
+  border-color:var(--red);
+}
+
+@media(pointer:coarse){
+  .cursor,.cursor-ring{display:none}
+}
+
+/* =========================================================
+   LOADER
+========================================================= */
+
+.loader{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  background:#050505;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  padding:clamp(24px,5vw,70px);
+  transition:
+    opacity .8s ease,
+    visibility .8s ease;
+}
+
+.loader.hide{
+  opacity:0;
+  visibility:hidden;
+}
+
+.loader-name{
+  font-size:clamp(48px,12vw,150px);
+  font-weight:700;
+  letter-spacing:-.06em;
+  line-height:.8;
+}
+
+.loader-meta{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:.15em;
+}
+
+.loader-progress{
+  position:absolute;
+  left:0;
+  bottom:0;
+  height:2px;
+  width:0;
+  background:var(--red);
+}
+
+/* =========================================================
+   NAV
+========================================================= */
+
+.nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:500;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:
+    calc(22px + env(safe-area-inset-top))
+    clamp(20px,5vw,72px)
+    22px;
+  mix-blend-mode:difference;
+}
+
+.nav-logo{
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.16em;
+}
+
+.lang{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.12em;
+}
+
+.lang button{
+  color:#777;
+  cursor:none;
+}
+
+.lang button.active{
+  color:white;
+}
+
+@media(pointer:coarse){
+  .lang button{cursor:pointer}
+}
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero{
+  min-height:100svh;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  background:
+    radial-gradient(
+      circle at 72% 48%,
+      rgba(125,11,16,.22),
+      transparent 30%
+    ),
+    #050505;
+}
+
+.hero-grid{
+  position:absolute;
+  inset:0;
+  opacity:.18;
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:80px 80px;
+  mask-image:linear-gradient(to bottom,black,transparent);
+}
+
+.hero-orbit{
+  position:absolute;
+  width:min(60vw,760px);
+  aspect-ratio:1;
+  right:-5%;
+  top:50%;
+  transform:translateY(-50%);
+  border:1px solid rgba(217,39,49,.22);
+  border-radius:50%;
+  box-shadow:
+    0 0 100px rgba(125,11,16,.08),
+    inset 0 0 100px rgba(125,11,16,.04);
+}
+
+.hero-orbit::before,
+.hero-orbit::after{
+  content:"";
+  position:absolute;
+  inset:12%;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:50%;
+}
+
+.hero-orbit::after{
+  inset:30%;
+  border-color:rgba(217,39,49,.14);
+}
+
+.hero-content{
+  position:relative;
+  z-index:5;
+  width:100%;
+  padding-top:80px;
+}
+
+.hero-index{
+  margin-bottom:28px;
+}
+
+.hero-title{
+  font-size:clamp(76px,17vw,250px);
+  line-height:.76;
+  letter-spacing:-.075em;
+  font-weight:700;
+  position:relative;
+  z-index:3;
+}
+
+.hero-title .ghost{
+  color:transparent;
+  -webkit-text-stroke:1px rgba(238,233,230,.45);
+}
+
+.hero-title .red{
+  color:var(--red);
+}
+
+.hero-bottom{
+  margin-top:50px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:30px;
+}
+
+.hero-description{
+  max-width:420px;
+  color:#aaa3a0;
+  font-size:15px;
+  line-height:1.7;
+}
+
+.hero-role{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:.13em;
+  margin-bottom:10px;
+}
+
+.hero-coordinates{
+  font-family:var(--mono);
+  font-size:9px;
+  line-height:2;
+  color:var(--muted);
+  text-align:right;
+}
+
+.hero-scroll{
+  position:absolute;
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:.2em;
+  color:var(--muted);
+}
+
+.hero-scroll span:last-child{
+  width:45px;
+  height:1px;
+  background:linear-gradient(90deg,var(--muted),transparent);
+}
+
+/* central 3D object */
+
+.core{
+  position:absolute;
+  right:17%;
+  top:50%;
+  width:min(27vw,370px);
+  aspect-ratio:1;
+  transform:translateY(-50%);
+  z-index:2;
+  perspective:1000px;
+}
+
+.core-sphere{
+  position:absolute;
+  inset:17%;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+      #454545 0%,
+      #151515 28%,
+      #080808 65%,
+      #020202 100%
+    );
+  box-shadow:
+    -25px -20px 60px rgba(255,255,255,.08),
+    25px 30px 90px rgba(217,39,49,.12),
+    inset -20px -20px 40px rgba(0,0,0,.9);
+  animation:floatCore 7s ease-in-out infinite;
+}
+
+.core-sphere::after{
+  content:"";
+  position:absolute;
+  inset:12%;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.core-ring{
+  position:absolute;
+  inset:0;
+  border:1px solid rgba(217,39,49,.65);
+  border-radius:50%;
+  transform:rotateX(68deg) rotateZ(18deg);
+  animation:orbit 12s linear infinite;
+}
+
+.core-ring:nth-child(3){
+  inset:7%;
+  border-color:rgba(255,255,255,.17);
+  transform:rotateY(70deg) rotateZ(-22deg);
+  animation-duration:18s;
+  animation-direction:reverse;
+}
+
+.core-ring:nth-child(4){
+  inset:23%;
+  border-color:rgba(217,39,49,.18);
+  transform:rotateX(75deg) rotateY(30deg);
+  animation-duration:8s;
+}
+
+.core-point{
+  position:absolute;
+  width:7px;
+  height:7px;
+  background:var(--red);
+  border-radius:50%;
+  top:7%;
+  left:50%;
+  box-shadow:0 0 20px var(--red);
+}
+
+@keyframes orbit{
+  to{transform:rotateX(68deg) rotateZ(378deg)}
+}
+
+@keyframes floatCore{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-18px)}
+}
+
+@media(max-width:900px){
+  .hero-orbit{
+    width:100vw;
+    right:-45%;
+  }
+
+  .core{
+    width:250px;
+    right:3%;
+    top:38%;
+    opacity:.7;
+  }
+
+  .hero-title{
+    font-size:clamp(70px,19vw,150px);
+  }
+
+  .hero-bottom{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .hero-coordinates{
+    text-align:left;
+  }
+}
+
+/* =========================================================
+   INTRO STATEMENT
+========================================================= */
+
+.statement{
+  min-height:85svh;
+  display:flex;
+  align-items:center;
+  background:#080808;
+  overflow:hidden;
+}
+
+.statement::before{
+  content:"ASHRAF";
+  position:absolute;
+  right:-8vw;
+  top:50%;
+  transform:translateY(-50%) rotate(-90deg);
+  font-size:clamp(100px,20vw,300px);
+  font-weight:700;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(255,255,255,.035);
+  pointer-events:none;
+}
+
+.statement-inner{
+  position:relative;
+  z-index:2;
+}
+
+.statement-label{
+  margin-bottom:50px;
+}
+
+.statement-text{
+  max-width:1050px;
+  font-size:clamp(38px,7.2vw,105px);
+  line-height:1;
+  letter-spacing:-.055em;
+  font-weight:500;
+}
+
+.statement-text span{
+  color:#55504e;
+  transition:color .5s ease;
+}
+
+.statement-text span.visible{
+  color:var(--white);
+}
+
+.statement-bottom{
+  display:flex;
+  justify-content:space-between;
+  margin-top:70px;
+  gap:30px;
+}
+
+.statement-bottom p{
+  max-width:380px;
+  color:var(--muted);
+  line-height:1.7;
+  font-size:14px;
+}
+
+/* =========================================================
+   IDENTITY
+========================================================= */
+
+.identity{
+  padding:170px 0;
+  background:#050505;
+}
+
+.identity-head{
+  display:grid;
+  grid-template-columns:.35fr 1fr;
+  gap:50px;
+  margin-bottom:100px;
+}
+
+.identity-title{
+  font-size:clamp(50px,9vw,130px);
+  line-height:.86;
+  letter-spacing:-.06em;
+  font-weight:600;
+}
+
+.identity-title .outline{
+  color:transparent;
+  -webkit-text-stroke:1px #777;
+}
+
+.identity-layout{
+  display:grid;
+  grid-template-columns:1fr .8fr;
+  gap:100px;
+  align-items:end;
+}
+
+.identity-copy{
+  max-width:650px;
+}
+
+.identity-copy p{
+  font-size:clamp(20px,2.4vw,32px);
+  line-height:1.35;
+  color:#c9c3c0;
+  letter-spacing:-.025em;
+}
+
+.signature{
+  margin-top:65px;
+  font-family:var(--arabic);
+  font-size:clamp(35px,5vw,65px);
+  display:inline-block;
+  color:white;
+}
+
+.identity-data{
+  border-top:1px solid var(--line);
+}
+
+.data-row{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  padding:18px 0;
+  border-bottom:1px solid var(--line);
+  font-family:var(--mono);
+  font-size:10px;
+}
+
+.data-row span:first-child{
+  color:var(--muted);
+}
+
+.data-row span:last-child{
+  text-align:right;
+}
+
+.birth{
+  margin-top:50px;
+}
+
+.birth-title{
+  margin-bottom:20px;
+}
+
+.countdown{
+  display:flex;
+  gap:22px;
+}
+
+.count-number{
+  font-size:clamp(28px,4vw,48px);
+  font-weight:500;
+  letter-spacing:-.04em;
+}
+
+.count-label{
+  display:block;
+  margin-top:4px;
+  font-family:var(--mono);
+  color:var(--muted);
+  font-size:8px;
+  letter-spacing:.13em;
+}
+
+@media(max-width:850px){
+  .identity-head,
+  .identity-layout{
+    grid-template-columns:1fr;
+  }
+
+  .identity-layout{
+    gap:60px;
+  }
+}
+
+/* =========================================================
+   STACK
+========================================================= */
+
+.stack{
+  padding:160px 0;
+  background:#090909;
+}
+
+.stack-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:80px;
+}
+
+.stack-title{
+  font-size:clamp(60px,10vw,150px);
+  letter-spacing:-.07em;
+  line-height:.8;
+}
+
+.stack-title small{
+  display:block;
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:.16em;
+  margin-bottom:20px;
+}
+
+.skill{
+  position:relative;
+  border-top:1px solid var(--line);
+  padding:27px 0;
+  display:grid;
+  grid-template-columns:80px 1fr auto;
+  align-items:center;
+  gap:25px;
+  overflow:hidden;
+  cursor:none;
+}
+
+.skill:last-child{
+  border-bottom:1px solid var(--line);
+}
+
+.skill-number{
+  font-family:var(--mono);
+  color:var(--muted);
+  font-size:10px;
+}
+
+.skill-name{
+  font-size:clamp(30px,5vw,65px);
+  letter-spacing:-.045em;
+  transition:transform .5s cubic-bezier(.16,1,.3,1);
+}
+
+.skill-meta{
+  font-family:var(--mono);
+  color:var(--muted);
+  font-size:9px;
+  text-align:right;
+}
+
+.skill-fill{
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:0;
+  height:2px;
+  background:var(--red);
+  transition:width .7s cubic-bezier(.16,1,.3,1);
+}
+
+.skill:hover .skill-fill{
+  width:100%;
+}
+
+.skill:hover .skill-name{
+  transform:translateX(18px);
+}
+
+[dir="rtl"] .skill:hover .skill-name{
+  transform:translateX(-18px);
+}
+
+@media(max-width:650px){
+  .skill{
+    grid-template-columns:45px 1fr;
+  }
+
+  .skill-meta{
+    grid-column:2;
+    text-align:left;
+  }
+}
+
+/* =========================================================
+   BUSINESS WORLD
+========================================================= */
+
+.business{
+  min-height:100svh;
+  display:flex;
+  align-items:center;
+  background:
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(217,39,49,.1),
+      transparent 32%
+    ),
+    #050505;
+  overflow:hidden;
+}
+
+.business-ring{
+  position:absolute;
+  right:-10%;
+  width:65vw;
+  max-width:900px;
+  aspect-ratio:1;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.business-ring::before,
+.business-ring::after{
+  content:"";
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(217,39,49,.13);
+}
+
+.business-ring::before{inset:15%}
+.business-ring::after{inset:35%}
+
+.business-content{
+  position:relative;
+  z-index:2;
+  width:100%;
+}
+
+.business-small{
+  margin-bottom:35px;
+}
+
+.business-title{
+  font-size:clamp(65px,11vw,165px);
+  line-height:.82;
+  letter-spacing:-.07em;
+}
+
+.business-title .thin{
+  font-weight:400;
+  color:#68615e;
+}
+
+.business-copy{
+  max-width:440px;
+  margin-top:45px;
+  margin-left:25%;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.business-tags{
+  display:flex;
+  gap:10px;
+  margin-top:40px;
+  flex-wrap:wrap;
+}
+
+.business-tag{
+  border:1px solid var(--line);
+  padding:12px 18px;
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:.12em;
+}
+
+/* =========================================================
+   JOURNEY
+========================================================= */
+
+.journey{
+  padding:170px 0;
+  background:#090909;
+}
+
+.journey-intro{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:100px;
+}
+
+.journey-title{
+  font-size:clamp(65px,10vw,150px);
+  line-height:.82;
+  letter-spacing:-.07em;
+}
+
+.journey-description{
+  max-width:320px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+.journey-list{
+  border-top:1px solid var(--line);
+}
+
+.journey-item{
+  display:grid;
+  grid-template-columns:80px 1fr 1fr;
+  padding:35px 0;
+  border-bottom:1px solid var(--line);
+  align-items:center;
+  transition:padding .5s ease;
+}
+
+.journey-item:hover{
+  padding-left:20px;
+  padding-right:20px;
+  background:rgba(255,255,255,.015);
+}
+
+.journey-num{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--red);
+}
+
+.journey-name{
+  font-size:clamp(28px,4vw,55px);
+  letter-spacing:-.04em;
+}
+
+.journey-text{
+  color:var(--muted);
+  font-size:13px;
+}
+
+@media(max-width:700px){
+  .journey-intro{
+    display:block;
+  }
+
+  .journey-description{
+    margin-top:30px;
+  }
+
+  .journey-item{
+    grid-template-columns:45px 1fr;
+    gap:15px;
+  }
+
+  .journey-text{
+    grid-column:2;
+  }
+}
+
+/* =========================================================
+   SOCIAL
+========================================================= */
+
+.social{
+  padding:160px 0;
+  background:#050505;
+}
+
+.social-heading{
+  font-size:clamp(65px,11vw,155px);
+  letter-spacing:-.075em;
+  line-height:.8;
+  margin-bottom:90px;
+}
+
+.social-heading .outline{
+  color:transparent;
+  -webkit-text-stroke:1px rgba(238,233,230,.5);
+}
+
+.social-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  border-top:1px solid var(--line);
+  border-left:1px solid var(--line);
+}
+
+.social-link{
+  min-height:230px;
+  padding:24px;
+  border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  overflow:hidden;
+  transition:background .4s ease;
+}
+
+.social-link::before{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:var(--red);
+  filter:blur(70px);
+  opacity:0;
+  right:-100px;
+  bottom:-100px;
+  transition:opacity .5s ease;
+}
+
+.social-link:hover{
+  background:#0c0c0c;
+}
+
+.social-link:hover::before{
+  opacity:.22;
+}
+
+.social-platform{
+  font-family:var(--mono);
+  font-size:9px;
+  color:var(--muted);
+  letter-spacing:.15em;
+}
+
+.social-handle{
+  position:relative;
+  font-size:17px;
+  z-index:2;
+}
+
+.social-arrow{
+  position:relative;
+  z-index:2;
+  align-self:flex-end;
+  font-size:25px;
+}
+
+@media(max-width:900px){
+  .social-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:550px){
+  .social-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+/* =========================================================
+   CONTACT
+========================================================= */
+
+.contact{
+  min-height:90svh;
+  display:flex;
+  align-items:center;
+  background:#090909;
+}
+
+.contact-label{
+  margin-bottom:45px;
+}
+
+.contact-title{
+  font-size:clamp(65px,11vw,160px);
+  line-height:.8;
+  letter-spacing:-.075em;
+}
+
+.contact-title .outline{
+  color:transparent;
+  -webkit-text-stroke:1px rgba(238,233,230,.5);
+}
+
+.contact-copy{
+  margin-top:50px;
+  max-width:420px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.contact-actions{
+  margin-top:40px;
+  display:flex;
+  gap:12px;
+}
+
+.contact-button{
+  border:1px solid rgba(255,255,255,.2);
+  padding:17px 28px;
+  font-family:var(--mono);
+  font-size:9px;
+  letter-spacing:.15em;
+  transition:
+    background .3s ease,
+    color .3s ease,
+    border-color .3s ease;
+}
+
+.contact-button.primary{
+  background:white;
+  color:#050505;
+}
+
+.contact-button:hover{
+  background:var(--red);
+  border-color:var(--red);
+  color:white;
+}
+
+/* =========================================================
+   FINALE
+========================================================= */
+
+.finale{
+  height:100svh;
+  min-height:600px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#030303;
+}
+
+.finale-core{
+  position:absolute;
+  width:min(70vw,850px);
+  aspect-ratio:1;
+  border:1px solid rgba(217,39,49,.18);
+  border-radius:50%;
+  animation:finaleRotate 25s linear infinite;
+}
+
+.finale-core::before,
+.finale-core::after{
+  content:"";
+  position:absolute;
+  inset:12%;
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:50%;
+}
+
+.finale-core::after{
+  inset:35%;
+  border-color:rgba(217,39,49,.15);
+}
+
+@keyframes finaleRotate{
+  to{transform:rotate(360deg)}
+}
+
+.finale-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+}
+
+.finale-name{
+  font-size:clamp(70px,15vw,220px);
+  font-weight:700;
+  letter-spacing:-.08em;
+  line-height:.8;
+}
+
+.finale-signature{
+  margin-top:35px;
+  font-family:var(--arabic);
+  font-size:clamp(30px,5vw,60px);
+}
+
+.finale-meta{
+  margin-top:30px;
+}
+
+footer{
+  border-top:1px solid var(--line);
+  padding:25px clamp(20px,5vw,72px);
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  font-family:var(--mono);
+  color:var(--muted);
+  font-size:9px;
+  letter-spacing:.1em;
+}
+
+footer .signature-small{
+  font-family:var(--arabic);
+  color:white;
+  font-size:13px;
+}
+
+@media(max-width:650px){
+  footer{
+    flex-direction:column;
+  }
+}
+
+/* =========================================================
+   REVEAL
+========================================================= */
+
+.reveal{
+  opacity:0;
+  transform:translateY(35px);
+  transition:
+    opacity .9s cubic-bezier(.16,1,.3,1),
+    transform .9s cubic-bezier(.16,1,.3,1);
+}
+
+.reveal.show{
+  opacity:1;
+  transform:none;
+}
+
+.word{
+  display:inline-block;
+  overflow:hidden;
+}
+
+.word-inner{
+  display:inline-block;
+  transform:translateY(110%);
+  transition:transform 1s cubic-bezier(.16,1,.3,1);
+}
+
+.reveal.show .word-inner{
+  transform:none;
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div>
+    <div class="loader-name">ASHRAF</div>
+    <div class="loader-meta">DIGITAL IDENTITY / 001</div>
+  </div>
+  <div class="loader-meta" id="loaderPct">00%</div>
+  <div class="loader-progress" id="loaderProgress"></div>
+</div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-logo">ASHRAF</div>
+
+  <div class="lang">
+    <button id="enBtn" class="active">EN</button>
+    <span>/</span>
+    <button id="arBtn">AR</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ======================================================
+     HERO
+====================================================== -->
+
+<section class="hero" id="hero">
+
+  <div class="hero-grid"></div>
+  <div class="hero-orbit"></div>
+
+  <div class="core" id="core">
+    <div class="core-sphere"></div>
+    <div class="core-ring"></div>
+    <div class="core-ring"></div>
+    <div class="core-ring"></div>
+    <div class="core-point"></div>
+  </div>
+
+  <div class="wrap hero-content">
+
+    <div class="mono hero-index reveal">
+      01 / DIGITAL IDENTITY
+    </div>
+
+    <h1 class="hero-title" id="heroTitle">
+      <span>A</span><span class="ghost">S</span><span>H</span><span class="red">R</span><span>A</span><span>F</span>
+    </h1>
+
+    <div class="hero-bottom">
+
+      <div>
+        <div class="hero-role">
+          DEVELOPER · PROGRAMMER · DIGITAL BUILDER
+        </div>
+
+        <p class="hero-description reveal">
+          Quiet life. Refined taste. Bigger goals.
+        </p>
+      </div>
+
+      <div class="hero-coordinates">
+        <div>STATUS / <strong style="color:white">ONLINE</strong></div>
+        <div>LOCATION / EGYPT · MINYA</div>
+        <div>AGE / <span id="heroAge">19</span></div>
+        <div>FIELD / DEVELOPMENT</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    SCROLL <span></span>
+  </div>
+</section>
+
+
+<!-- ======================================================
+     STATEMENT
+====================================================== -->
+
+<section class="statement">
+
+  <div class="wrap statement-inner">
+
+    <div class="mono statement-label reveal">
+      02 / THE PHILOSOPHY
+    </div>
+
+    <div class="statement-text" id="statementText">
+      Quiet life.<br>
+      Refined taste.<br>
+      Bigger goals.
+    </div>
+
+    <div class="statement-bottom">
+
+      <p>
+        A digital identity built around technology,
+        curiosity, business thinking and a long-term vision.
+      </p>
+
+      <div class="mono">
+        BUILD WITH INTENTION<br>
+        THINK BEYOND THE SCREEN
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ======================================================
+     IDENTITY
+====================================================== -->
+
+<section class="identity" id="about">
+
+  <div class="wrap">
+
+    <div class="identity-head reveal">
+      <div class="mono">03 / IDENTITY</div>
+
+      <h2 class="identity-title">
+        WHO<br>
+        <span class="outline">IS</span><br>
+        ASHRAF?
+      </h2>
+    </div>
+
+    <div class="identity-layout">
+
+      <div class="identity-copy">
+
+        <p>
+          I'm ASHRAF — a 19-year-old developer from Egypt,
+          building with technology while studying business,
+          economics, and politics.
+        </p>
+
+        <div class="signature">
+          أشـــــــــــــروف
+        </div>
+
+      </div>
+
+      <div>
+
+        <div class="identity-data">
+
+          <div class="data-row">
+            <span>AGE</span>
+            <span id="ageData">19 YEARS OLD</span>
+          </div>
+
+          <div class="data-row">
+            <span>LOCATION</span>
+            <span>EGYPT / MINYA</span>
+          </div>
+
+          <div class="data-row">
+            <span>BIRTHDAY</span>
+            <span>01 / 03</span>
+          </div>
+
+          <div class="data-row">
+            <span>FACULTY</span>
+            <span>POLITICS & ECONOMICS</span>
+          </div>
+
+        </div>
+
+        <div class="birth">
+
+          <div class="mono birth-title">
+            NEXT BIRTHDAY / 01.03
+          </div>
+
+          <div class="countdown">
+
+            <div>
+              <div class="count-number" id="days">--</div>
+              <span class="count-label">DAYS</span>
+            </div>
+
+            <div>
+              <div class="count-number" id="hours">--</div>
+              <span class="count-label">HOURS</span>
+            </div>
+
+            <div>
+              <div class="count-number" id="minutes">--</div>
+              <span class="count-label">MINUTES</span>
+            </div>
+
+            <div>
+              <div class="count-number" id="seconds">--</div>
+              <span class="count-label">SECONDS</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ======================================================
+     STACK
+====================================================== -->
+
+<section class="stack" id="skills">
+
+  <div class="wrap">
+
+    <div class="stack-header">
+
+      <div>
+        <div class="mono">04 / CAPABILITIES</div>
+      </div>
+
+      <div class="mono">SYSTEMS / LOGIC / CREATION</div>
+
+    </div>
+
+    <h2 class="stack-title reveal">
+      THINGS<br>
+      I <span class="red">SPEAK.</span>
+    </h2>
+
+    <div class="skill-list" style="margin-top:90px">
+
+      <div class="skill reveal">
+        <div class="skill-number">01</div>
+        <div class="skill-name">C++</div>
+        <div class="skill-meta">SYSTEMS · LOGIC · CONTROL</div>
+        <div class="skill-fill"></div>
+      </div>
+
+      <div class="skill reveal">
+        <div class="skill-number">02</div>
+        <div class="skill-name">PYTHON</div>
+        <div class="skill-meta">AUTOMATION · DATA · TOOLS</div>
+        <div class="skill-fill"></div>
+      </div>
+
+      <div class="skill reveal">
+        <div class="skill-number">03</div>
+        <div class="skill-name">JAVASCRIPT</div>
+        <div class="skill-meta">INTERFACE · LOGIC · MOTION</div>
+        <div class="skill-fill"></div>
+      </div>
+
+      <div class="skill reveal">
+        <div class="skill-number">04</div>
+        <div class="skill-name">API</div>
+        <div class="skill-meta">INTEGRATION · DATA FLOW</div>
+        <div class="skill-fill"></div>
+      </div>
+
+      <div class="skill reveal">
+        <div class="skill-number">05</div>
+        <div class="skill-name">DATABASE</div>
+        <div class="skill-meta">STRUCTURE · STORAGE</div>
+        <div class="skill-fill"></div>
+      </div>
+
+      <div class="skill reveal">
+        <div class="skill-number">06</div>
+        <div class="skill-name">BOT DEVELOPMENT</div>
+        <div class="skill-meta">AUTOMATION · SCALE</div>
+        <div class="skill-fill"></div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ======================================================
+     BUSINESS
+====================================================== -->
+
+<section class="business" id="business">
+
+  <div class="business-ring"></div>
+
+  <div class="wrap business-content">
+
+    <div class="mono business-small reveal">
+      05 / BUSINESS THINKING
+    </div>
+
+    <h2 class="business-title reveal">
+      A BIG<br>
+      <span class="thin">BUSINESS</span><br>
+      MIND.
+    </h2>
+
+    <p class="business-copy reveal">
+      Technology is only one side of the picture.
+      The bigger vision is understanding how technology,
+      business and people connect — then building around that.
+    </p>
+
+    <div class="business-tags reveal">
+      <div class="business-tag">TECH</div>
+      <div class="business-tag">BUSINESS</div>
+      <div class="business-tag">VISION</div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ======================================================
+     JOURNEY
+====================================================== -->
+
+<section class="journey">
+
+  <div class="wrap">
+
+    <div class="journey-intro">
+
+      <h2 class="journey-title reveal">
+        BUILD.<br>
+        LEARN.<br>
+        <span class="red">EVOLVE.</span>
+      </h2>
+
+      <p class="journey-description reveal">
+        Curiosity became code.
+        Experience became perspective.
+        And every experiment became part of the process.
+      </p>
+
+    </div>
+
+    <div class="journey-list">
+
+      <div class="journey-item reveal">
+        <div class="journey-num">01</div>
+        <div class="journey-name">BUILD</div>
+        <div class="journey-text">Curiosity became code.</div>
+      </div>
+
+      <div class="journey-item reveal">
+        <div class="journey-num">02</div>
+        <div class="journey-name">LEARN</div>
+        <div class="journey-text">Not everything should stay built.</div>
+      </div>
+
+      <div class="journey-item reveal">
+        <div class="journey-num">03</div>
+        <div class="journey-name">EVOLVE</div>
+        <div class="journey-text">Build with intention.</div>
+      </div>
+
+      <div class="journey-item reveal">
+        <div class="journey-num">04</div>
+        <div class="journey-name">MINDSET</div>
+        <div class="journey-text">Every loss is a new beginning.</div>
+      </div>
+
+    </div>
+
+    <p class="mono reveal" style="max-width:700px;margin-top:60px;line-height:2">
+      One experiment grew into a large Telegram automation
+      project with capabilities that could harm people.
+      I chose to shut it down. Learning includes understanding
+      responsibility, not just capability.
+    </p>
+
+  </div>
+</section>
+
+
+<!-- ======================================================
+     SOCIAL
+====================================================== -->
+
+<section class="social" id="social">
+
+  <div class="wrap">
+
+    <div class="mono reveal">
+      06 / ELSEWHERE
+    </div>
+
+    <h2 class="social-heading reveal">
+      FIND<br>
+      <span class="outline">ASHRAF.</span>
+    </h2>
+
+    <div class="social-grid">
+
+      <a class="social-link" href="https://instagram.com/iashraf_mousa" target="_blank" rel="noopener">
+        <div class="social-platform">INSTAGRAM</div>
+        <div class="social-handle">@iashraf_mousa</div>
+        <div class="social-arrow">↗</div>
+      </a>
+
+      <a class="social-link" href="https://facebook.com/3shrafmousa" target="_blank" rel="noopener">
+        <div class="social-platform">FACEBOOK</div>
+        <div class="social-handle">3shrafmousa</div>
+        <div class="social-arrow">↗</div>
+      </a>
+
+      <a class="social-link" href="https://t.me/ll4me" target="_blank" rel="noopener">
+        <div class="social-platform">TELEGRAM</div>
+        <div class="social-handle">@ll4me</div>
+        <div class="social-arrow">↗</div>
+      </a>
+
+      <a class="social-link" href="https://t.me/iashrof" target="_blank" rel="noopener">
+        <div class="social-platform">TELEGRAM CHANNEL</div>
+        <div class="social-handle">@iashrof</div>
+        <div class="social-arrow">↗</div>
+      </a>
+
+      <a class="social-link" href="https://tiktok.com/@iashraf_mousa" target="_blank" rel="noopener">
+        <div class="social-platform">TIKTOK</div>
+        <div class="social-handle">@iashraf_mousa</div>
+        <div class="social-arrow">↗</div>
+      </a>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ======================================================
+     CONTACT
+====================================================== -->
+
+<section class="contact">
+
+  <div class="wrap">
+
+    <div class="mono contact-label reveal">
+      07 / CONNECTION
+    </div>
+
+    <h2 class="contact-title reveal">
+      LET'S BUILD<br>
+      SOMETHING<br>
+      <span class="outline">WORTH</span><br>
+      REMEMBERING.
+    </h2>
+
+    <p class="contact-copy reveal">
+      For ideas, collaborations, digital products,
+      or just a good conversation about technology and business.
+    </p>
+
+    <div class="contact-actions reveal">
+
+      <a
+        class="contact-button primary"
+        href="https://t.me/ll4me"
+        target="_blank"
+        rel="noopener"
+      >
+        MESSAGE ME
+      </a>
+
+      <button class="contact-button" id="topBtn">
+        BACK TO TOP
+      </button>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ======================================================
+     FINALE
+====================================================== -->
+
+<section class="finale">
+
+  <div class="finale-core"></div>
+
+  <div class="finale-content">
+
+    <div class="mono">
+      08 / END OF EXPERIENCE
+    </div>
+
+    <div class="finale-name">
+      ASHRAF
+    </div>
+
+    <div class="finale-signature">
+      أشـــــــــــــروف
+    </div>
+
+    <div class="mono finale-meta">
+      QUIET LIFE / REFINED TASTE / BIGGER GOALS
+    </div>
+
+  </div>
+
+</section>
+
+</main>
+
+<footer>
+  <div>© 2026 ASHRAF</div>
+  <div class="signature-small">أشـــــــــــــروف</div>
+  <div>QUIET LIFE / REFINED TASTE / BIGGER GOALS</div>
+</footer>
+
+
+<script>
+/* =========================================================
+   PERFORMANCE / UTILITIES
+========================================================= */
+
+const reduced =
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const coarse =
+  window.matchMedia("(pointer:coarse)").matches;
+
+
+/* =========================================================
+   LOADER
+========================================================= */
+
+const loader = document.getElementById("loader");
+const loaderProgress = document.getElementById("loaderProgress");
+const loaderPct = document.getElementById("loaderPct");
+
+let progress = 0;
+
+function loaderTick(){
+
+  progress += Math.random() * 16 + 8;
+
+  if(progress >= 100){
+    progress = 100;
+  }
+
+  loaderProgress.style.width = progress + "%";
+  loaderPct.textContent =
+    String(Math.floor(progress)).padStart(2,"0") + "%";
+
+  if(progress < 100){
+    requestAnimationFrame(loaderTick);
+  }else{
+    setTimeout(()=>{
+      loader.classList.add("hide");
+      revealHero();
+    },350);
+  }
+}
+
+function revealHero(){
+
+  document
+    .querySelectorAll(".hero .reveal")
+    .forEach((el,i)=>{
+      setTimeout(()=>{
+        el.classList.add("show");
+      },i*120);
+    });
+
+  document
+    .getElementById("heroTitle")
+    .animate(
+      [
+        {opacity:0,transform:"translateY(50px)"},
+        {opacity:1,transform:"translateY(0)"}
+      ],
+      {
+        duration:1100,
+        easing:"cubic-bezier(.16,1,.3,1)",
+        fill:"forwards"
+      }
+    );
+}
+
+if(document.readyState === "complete"){
+  setTimeout(loaderTick,200);
+}else{
+  window.addEventListener("load",()=>{
+    setTimeout(loaderTick,200);
+  });
+}
+
+
+/* =========================================================
+   CURSOR
+========================================================= */
+
+if(!coarse){
+
+  const cursor = document.getElementById("cursor");
+  const ring = document.getElementById("cursorRing");
+
+  let x=innerWidth/2;
+  let y=innerHeight/2;
+
+  let rx=x;
+  let ry=y;
+
+  window.addEventListener("mousemove",e=>{
+    x=e.clientX;
+    y=e.clientY;
+
+    cursor.style.left=x+"px";
+    cursor.style.top=y+"px";
+  });
+
+  function cursorLoop(){
+
+    rx += (x-rx)*.16;
+    ry += (y-ry)*.16;
+
+    ring.style.left=rx+"px";
+    ring.style.top=ry+"px";
+
+    requestAnimationFrame(cursorLoop);
+  }
+
+  cursorLoop();
+
+  document
+    .querySelectorAll("a,button,.skill")
+    .forEach(el=>{
+
+      el.addEventListener("mouseenter",()=>{
+        ring.classList.add("active");
+      });
+
+      el.addEventListener("mouseleave",()=>{
+        ring.classList.remove("active");
+      });
+
+    });
+}
+
+
+/* =========================================================
+   REVEALS
+========================================================= */
+
+const revealObserver =
+  new IntersectionObserver(
+    entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add("show");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold:.12,
+      rootMargin:"0px 0px -50px"
+    }
+  );
+
+document
+  .querySelectorAll(".reveal")
+  .forEach(el=>revealObserver.observe(el));
+
+
+/* =========================================================
+   STATEMENT WORD REVEAL
+========================================================= */
+
+const statement =
+  document.getElementById("statementText");
+
+const originalText = statement.innerHTML;
+
+statement.innerHTML =
+  originalText
+    .split(/(\s+)/)
+    .map(part=>{
+      if(/\s+/.test(part)) return part;
+      return `<span>${part}</span>`;
+    })
+    .join("");
+
+const statementObserver =
+  new IntersectionObserver(
+    entries=>{
+      if(entries[0].isIntersecting){
+
+        statement
+          .querySelectorAll("span")
+          .forEach((span,i)=>{
+            setTimeout(()=>{
+              span.classList.add("visible");
+            },i*130);
+          });
+
+        statementObserver.disconnect();
+      }
+    },
+    {threshold:.3}
+  );
+
+statementObserver.observe(statement);
+
+
+/* =========================================================
+   CORE PARALLAX
+========================================================= */
+
+const core =
+  document.getElementById("core");
+
+if(!coarse && !reduced){
+
+  let targetX=0;
+  let targetY=0;
+  let currentX=0;
+  let currentY=0;
+
+  window.addEventListener("mousemove",e=>{
+
+    targetX =
+      (e.clientX / innerWidth - .5) * 14;
+
+    targetY =
+      (e.clientY / innerHeight - .5) * 10;
+
+  });
+
+  function coreLoop(){
+
+    currentX += (targetX-currentX)*.04;
+    currentY += (targetY-currentY)*.04;
+
+    core.style.marginLeft =
+      currentX + "px";
+
+    core.style.marginTop =
+      currentY + "px";
+
+    requestAnimationFrame(coreLoop);
+  }
+
+  coreLoop();
+}
+
+
+/* =========================================================
+   SKILL INTERACTION
+========================================================= */
+
+document
+  .querySelectorAll(".skill")
+  .forEach(skill=>{
+
+    skill.addEventListener("mouseenter",()=>{
+      skill.style.paddingLeft="18px";
+      skill.style.paddingRight="18px";
+    });
+
+    skill.addEventListener("mouseleave",()=>{
+      skill.style.paddingLeft="";
+      skill.style.paddingRight="";
+    });
+
+  });
+
+
+/* =========================================================
+   AGE + BIRTHDAY
+========================================================= */
+
+function updateBirthday(){
+
+  const now = new Date();
+
+  let year = now.getFullYear();
+
+  let birthday =
+    new Date(year,2,1,0,0,0);
+
+  if(birthday <= now){
+    birthday =
+      new Date(year+1,2,1,0,0,0);
+  }
+
+  const diff =
+    birthday.getTime()-now.getTime();
+
+  const days =
+    Math.floor(diff/86400000);
+
+  const hours =
+    Math.floor(
+      (diff%86400000)/3600000
+    );
+
+  const minutes =
+    Math.floor(
+      (diff%3600000)/60000
+    );
+
+  const seconds =
+    Math.floor(
+      (diff%60000)/1000
+    );
+
+  document.getElementById("days").textContent =
+    days;
+
+  document.getElementById("hours").textContent =
+    String(hours).padStart(2,"0");
+
+  document.getElementById("minutes").textContent =
+    String(minutes).padStart(2,"0");
+
+  document.getElementById("seconds").textContent =
+    String(seconds).padStart(2,"0");
+
+
+  /*
+    Birthday: March 1, 2007
+  */
+
+  const birth =
+    new Date(2007,2,1);
+
+  let age =
+    now.getFullYear()-birth.getFullYear();
+
+  const birthdayPassed =
+    now.getMonth()>2 ||
+    (
+      now.getMonth()===2 &&
+      now.getDate()>=1
+    );
+
+  if(!birthdayPassed) age--;
+
+  document.getElementById("heroAge").textContent =
+    age;
+
+  document.getElementById("ageData").textContent =
+    age+" YEARS OLD";
+}
+
+updateBirthday();
+
+setInterval(updateBirthday,1000);
+
+
+/* =========================================================
+   BACK TO TOP
+========================================================= */
+
+document
+  .getElementById("topBtn")
+  .addEventListener("click",()=>{
+
+    window.scrollTo({
+      top:0,
+      behavior:reduced ? "auto" : "smooth"
+    });
+
+  });
+
+
+/* =========================================================
+   SMALL SCROLL MOTION
+   One passive listener only.
+========================================================= */
+
+if(!reduced){
+
+  let ticking=false;
+
+  window.addEventListener(
+    "scroll",
+    ()=>{
+
+      if(ticking) return;
+
+      ticking=true;
+
+      requestAnimationFrame(()=>{
+
+        const scroll =
+          window.scrollY;
+
+        const hero =
+          document.getElementById("hero");
+
+        if(scroll < innerHeight){
+
+          const amount =
+            scroll*.035;
+
+          core.style.transform =
+            `translateY(calc(-50% + ${amount}px))`;
+
+        }
+
+        ticking=false;
+
+      });
+
+    },
+    {passive:true}
+  );
+}
+
+
+/* =========================================================
+   LANGUAGE SYSTEM
+========================================================= */
+
+const translations = {
+
+  en:{
+    title:"ASHRAF — Digital Identity"
+  },
+
+  ar:{
+    title:"أشرف — هوية رقمية"
+  }
+
+};
+
+function setLanguage(lang){
+
+  document.documentElement.lang=lang;
+
+  document.documentElement.dir =
+    lang==="ar" ? "rtl" : "ltr";
+
+  document.getElementById("enBtn")
+    .classList.toggle("active",lang==="en");
+
+  document.getElementById("arBtn")
+    .classList.toggle("active",lang==="ar");
+
+  document.title =
+    translations[lang].title;
+
+  try{
+    localStorage.setItem(
+      "ashraf-language",
+      lang
+    );
+  }catch(e){}
+}
+
+document
+  .getElementById("enBtn")
+  .addEventListener("click",()=>{
+    setLanguage("en");
+  });
+
+document
+  .getElementById("arBtn")
+  .addEventListener("click",()=>{
+    setLanguage("ar");
+  });
+
+try{
+
+  const saved =
+    localStorage.getItem("ashraf-language");
+
+  if(saved==="ar"){
+    setLanguage("ar");
+  }
+
+}catch(e){}
+
+
+/* =========================================================
+   VISIBILITY PERFORMANCE
+========================================================= */
+
+document.addEventListener(
+  "visibilitychange",
+  ()=>{
+    if(document.hidden){
+      document.documentElement.style
+        .setProperty("--animation-state","paused");
+    }
+  }
+);
+
+</script>
+
+</body>
+</html>
